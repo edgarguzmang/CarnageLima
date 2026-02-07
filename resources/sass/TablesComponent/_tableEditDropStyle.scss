@@ -1,0 +1,200 @@
+@import "../variables";
+$tl: 0.6s;
+
+.dx-button-borderless {
+    border: none;
+    background-color: transparent;
+    margin: 0;
+}
+
+.dx-button-borderless:hover {
+    border: none;
+    background-color: transparent;
+    transform: rotate(10deg);
+}
+
+.contentWarningAlert {
+    display: none;
+}
+
+.virtualTable {
+    // min-width: 350px;
+    min-width: auto;
+    max-height: 80dvh;
+    overflow: auto;
+    // margin-top: 2vh;
+    box-shadow: rgba(0, 0, 0, 0.226) 0px 1px 15px;
+    border-radius: 8px;
+    transition: .5s;
+    display: block;
+
+    .data-table {
+        background-color: #b9cfdf;
+    }
+
+    .dx-datagrid {
+        // display: block;
+        .dx-datagrid-headers {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+
+            .dx-datagrid-table {
+                .dx-header-row {
+                    background-color: #e3edf5;   //aqui
+                    font-weight: 600;
+                    color: black;
+                }
+            }
+        }
+
+        .dx-datagrid-content {
+            overflow: auto;
+            td{
+                // width: 200px;
+                cursor: pointer;
+            }
+            td:nth-child(1){
+                cursor: context-menu;
+            }
+           
+            .dx-row:hover {
+                align-items: center;
+                background-color: #f5f5f5;
+                color: black;
+            }
+        }
+
+        .dx-datagrid-content .dx-header-row:hover {
+            background-color: #e3edf5;
+            color: black;
+        }
+    }
+}
+
+.search-input {
+    height: 48px;
+    border-radius: 24px;
+    background: white;
+    padding: 1em;
+    cursor: text;
+    position: absolute;
+    transition: width 0.4s;
+}
+
+.search-icon {
+    position: relative;
+    top: 13px;
+    left: -11px;
+    color: black;
+    cursor: text;
+}
+
+// .containerTable::-webkit-scrollbar {
+//     width: 5px;
+//     height: 5px;
+// }
+
+// .containerTable::-webkit-scrollbar-track {
+//     background-color: #c2c2c2;
+//     border-radius: 4px;
+// }
+
+// .containerTable::-webkit-scrollbar-thumb {
+//     background-color: #10069f96;
+//     border-radius: 2px 4px 4px 2px;
+// }
+
+// .containerTable::-webkit-scrollbar-thumb:hover {
+//     background-color: #1B2654;
+// }
+
+@media screen and (max-width: 850px) {
+    .contentWarning {
+        display: none;
+        content: attr('hola');
+    }
+
+    .contentWarningAlert {
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        margin-top: 10vh;
+
+        &__content {
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: rgba(0, 0, 0, 0.35) 0px 2px 10px;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            &--img {
+                display: flex;
+                justify-content: center;
+            }
+
+            p {
+                text-align: center;
+            }
+
+            p:first-child {
+                margin-top: 10px;
+            }
+
+        }
+
+    }
+
+    .search-input {
+        width: 48px;
+        height: 48px;
+        border-radius: 24px;
+        background: white;
+        padding: 1em;
+        cursor: pointer;
+        position: absolute;
+        transition: width 0.4s;
+
+        &+label .search-icon {
+            color: #4d4d4d;
+        }
+
+        &:focus {
+            cursor: text;
+            width: 100%;
+            border-radius: auto;
+            background: white;
+            color: #4d4d4d;
+            padding: 1em;
+
+            &+label .search-icon {
+                color: #4d4d4d;
+            }
+        }
+
+        .search-input input::-moz-placeholder {
+            color: black;
+            font-size: 0.9em;
+        }
+
+        .search-input input:-ms-input-placeholder {
+            color: black;
+            font-size: 0.9em;
+        }
+
+        .search-input input::placeholder {
+            color: black;
+            font-size: 0.9em;
+        }
+    }
+
+    .search-icon {
+        position: relative;
+        top: 13px;
+        left: -11px;
+        color: black;
+        cursor: pointer;
+    }
+}
