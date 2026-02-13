@@ -36,6 +36,8 @@ const routes = [
     { path: "/municipios", import: lazy(() => import('./SAT/Municipios')) },
     { path: "/colonias", import: lazy(() => import('./SAT/Colonias')) },
 
+    { path: "/personas", import: lazy(() => import('./Catalogos/Personas')) },
+    // { path: "/personas", import: lazy(() => import('./Catalogos/Puestos')) },
 
 ];
 

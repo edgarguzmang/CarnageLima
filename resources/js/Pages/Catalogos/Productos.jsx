@@ -165,10 +165,10 @@ export default function Productos() {
 
     const handleSubmit = async (data) => {
         const isEdit = action === 'edit';
-        
+
         // URL dinámica basada en la acción
-        const url = isEdit 
-            ? getRoute("productos.update", data.IdProducto) 
+        const url = isEdit
+            ? getRoute("productos.update", data.IdProducto)
             : getRoute("productos.store");
 
         /**
@@ -176,9 +176,9 @@ export default function Productos() {
          * Usamos POST siempre y enviamos "_method: PUT" en el body.
          * Esto evita errores de "Method Not Allowed" en muchos servidores y configuraciones de Laravel.
          */
-        const method = "POST"; 
-        const payload = isEdit 
-            ? { ...data, _method: 'PUT' } 
+        const method = "POST";
+        const payload = isEdit
+            ? { ...data, _method: 'PUT' }
             : data;
 
         try {
@@ -199,7 +199,11 @@ export default function Productos() {
         <div className="p-4">
             <div className="flex justify-between items-center mb-6 border-b pb-4">
                 <h2 className="text-2xl font-bold text-gray-800">Catálogo de Productos</h2>
-                <button onClick={openCreate} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                <button onClick={openCreate}
+                    className="flex items-center px-4 py-2 text-base font-semibold text-white rounded-lg shadow-md  transition duration-150 ease-in-out"
+                    style={{ backgroundColor: '#A61A18' }}
+
+                >
                     + Nuevo Producto
                 </button>
             </div>
@@ -228,8 +232,8 @@ export default function Productos() {
                             cell: ({ item }) => item.fecha ? new Date(item.fecha).toLocaleDateString() : 'N/A'
                         },
                         {
-                            header: "Acciones", 
-                            accessor: "Acciones", 
+                            header: "Acciones",
+                            accessor: "Acciones",
                             cell: (eprops) => (
                                 <div className="flex space-x-2">
                                     <button

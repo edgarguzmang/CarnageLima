@@ -4,6 +4,7 @@
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RolesController;
+use App\Http\Controllers\Catalogs\AlmacenesController;
 use App\Http\Controllers\Catalogs\CodigosController;
 use App\Http\Controllers\Catalogs\CorreosController;
 use App\Http\Controllers\Catalogs\DepartamentoController;
@@ -126,7 +127,9 @@ Route::resource('municipios', MunicipiosController::class)->only([
     'update'
 ]);
 
-Route::resource('colonias', ColoniasController::class)->only([
+Route::apiResource('colonias', ColoniasController::class);
+
+Route::resource('almacenes', AlmacenesController::class)->only([
     'index',
     'store',
     'update'

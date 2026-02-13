@@ -11,16 +11,28 @@ class ColoniasController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Colonias::query();
+        // Cargamos la relación municipio
+        $query = Colonias::with('municipio');
 
-        // Filtro por municipio
-        if ($request->has('Colonia_IdMunicipio') && $request->Colonia_IdMunicipio != "") {
-            $query->where('Colonia_IdMunicipio', $request->Colonia_IdMunicipio);
+        if ($request->filled('Colonia_IdMunicipio')) {
+            $valor = $request->Colonia_IdMunicipio;
+
+            // Si es un número (ID), filtramos directo en la tabla Colonias
+            if (is_numeric($valor)) {
+                $query->where('Colonia_IdMunicipio', $valor);
+            }
+            // Si es texto (Nombre), filtramos a través de la relación
+            else {
+                $query->whereHas('municipio', function ($q) use ($valor) {
+                    $q->where('descripcionMunicipio', 'LIKE', "%{$valor}%");
+                });
+            }
         }
 
-        return response()->json($query->paginate(15), 200);
+        // Ordenar por nombre de la colonia de forma ascendente
+        // y ejecutar la consulta
+        return response()->json($query->orderBy('Colonia_Nombre', 'ASC')->get(), 200);
     }
-
     /**
      * Almacena una nueva colonia.
      */

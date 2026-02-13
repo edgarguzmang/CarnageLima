@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Almacenes extends Model
 {
     use HasFactory;
+
+    public $timestamps = false;
+    protected $table = 'dbo.Almacenes';
+    protected $primaryKey = 'IdAlmacen';
+    protected $fillable = [
+        'Nombre',
+        'Tipo',
+    ];
 }

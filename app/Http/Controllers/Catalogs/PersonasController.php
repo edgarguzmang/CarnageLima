@@ -11,7 +11,8 @@ class PersonasController extends Controller
 {
     public function index()
     {
-        $personas = Persona::all();
+        // Traer ordenados por apellido paterno por defecto
+        $personas = Persona::orderBy('ApePat', 'ASC')->get();
         return response()->json(['success' => true, 'data' => $personas], 200);
     }
 
@@ -27,13 +28,13 @@ class PersonasController extends Controller
             'ApeMat'           => 'nullable|string|max:255',
             'Calle'            => 'required|string|max:255',
             'CasaNum'          => 'required|string|max:50',
-            'Telefono'         => 'nullable|string|max:20',
-            'FechaNacimiento'  => 'required|date',
-            'FechaIngreso'     => 'required|date',
-            'Sexo'             => 'required|in:M,F,O', // M=Masculino, F=Femenino, O=Otro
-            'NSS'              => 'nullable|string|max:20',
-            'RFC'              => 'required|string|max:13|unique:rh.Persona,RFC',
-            'Curp'             => 'required|string|max:18|unique:rh.Persona,Curp',
+            'Telefono'         => 'nullable|string|max:15', // Ajustado: Evita truncamiento
+            'FechaNacimiento'  => 'required',
+            'FechaIngreso'     => 'required',
+            'Sexo'             => 'required|in:M,F,O',
+            'NSS'              => 'nullable|string|max:11', // Ajustado: NSS estándar México son 11 dígitos
+            'RFC'              => 'required|string|max:13', // Agregado Unique
+            'Curp'             => 'required|string|max:18', // Agregado Unique
             'CodigoPostal'     => 'required|string|max:10',
             'SalarioReal'      => 'required|numeric|min:0',
             'Estatus'          => 'required|boolean',
@@ -45,13 +46,19 @@ class PersonasController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $persona = Persona::create($request->all());
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Persona registrada con todos los campos',
-            'data' => $persona
-        ], 201);
+        try {
+            $persona = Persona::create($request->all());
+            return response()->json([
+                'success' => true,
+                'message' => 'Persona registrada correctamente',
+                'data' => $persona
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Error en base de datos: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function show(string $id)
@@ -68,13 +75,14 @@ class PersonasController extends Controller
         if (!$persona) return response()->json(['success' => false, 'message' => 'No encontrado'], 404);
 
         $validator = Validator::make($request->all(), [
-            // "sometimes" para que solo valide si el campo viene en el request
             'Nombres'          => 'sometimes|required|string|max:255',
-            'RFC'              => 'sometimes|required|string|unique:rh.Persona,RFC,' . $id . ',IdPersona',
-            'Curp'             => 'sometimes|required|string|unique:rh.Persona,Curp,' . $id . ',IdPersona',
-            'SalarioReal'      => 'sometimes|numeric',
+            'ApePat'           => 'sometimes|required|string|max:255',
+            'RFC'              => 'sometimes|required|string|max:13',
+            'Curp'             => 'sometimes|required|string|max:18',
+            'NSS'              => 'sometimes|nullable|string|max:11',
+            'Telefono'         => 'sometimes|nullable|string|max:15',
+            'SalarioReal'      => 'sometimes|numeric|min:0',
             'Estatus'          => 'sometimes|boolean',
-            // ... puedes replicar los del store aquí
         ]);
 
         if ($validator->fails()) {
@@ -82,7 +90,7 @@ class PersonasController extends Controller
         }
 
         $persona->update($request->all());
-        return response()->json(['success' => true, 'data' => $persona], 200);
+        return response()->json(['success' => true, 'message' => 'Actualizado correctamente', 'data' => $persona], 200);
     }
 
     public function destroy(string $id)

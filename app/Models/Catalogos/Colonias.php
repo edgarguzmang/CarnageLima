@@ -18,4 +18,10 @@ class Colonias extends Model
         'Colonia_cveSAT',
 
     ];
+
+    public function municipio()
+{
+    // El tercer parámetro debe ser la llave primaria real del municipio
+    return $this->belongsTo(Municipio::class, 'Colonia_IdMunicipio', 'idMunicipio');
+}
 }

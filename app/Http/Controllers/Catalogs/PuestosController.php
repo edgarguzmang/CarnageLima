@@ -4,96 +4,138 @@ namespace App\Http\Controllers\Catalogs;
 
 use App\Http\Controllers\Controller;
 use App\Models\Catalogos\Puestos;
-use App\Models\Departamento; // Asumiendo que el modelo Departamento está en App\Models
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\DB; // Para manejo de excepciones específicas de la base de datos
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 
 class PuestosController extends Controller
 {
-    public function index()
+    /**
+     * Muestra la lista de puestos ordenada alfabéticamente.
+     */
+    public function index(Request $request)
     {
-        // Eager loading + Filtro por estatus
-        $puestos = Puestos::with('departamento')
-            ->where('Puestos_estatus', true) // O usa 1 si tu DB no maneja booleanos nativos
-            ->get();
-
-        // Retorna la colección filtrada como respuesta JSON
-        return response()->json($puestos);
-    }
-    public function store(Request $request)
-    {
-        // 1. Validación de datos
-        $validatedData = $request->validate([
-            // Validar unicidad en la tabla 'dbo.Puestos' y columna 'Puestos_nombre'
-            'Puestos_nombre' => 'required|string|max:255',
-            'Puestos_estatus' => 'required|boolean',
-            // Asegurar que el id del departamento exista en la tabla 'dbo.Departamentos'
-            'Puestos_idDepartamento' => 'required',
-        ], [
-            // Mensajes de error personalizados
-            'Puestos_nombre.unique' => 'El nombre del puesto ya existe.',
-        ]);
-
         try {
-            // 2. Creación del registro
-            $puesto = Puestos::create($validatedData);
+            // Cargamos la relación con departamento si la necesitas en el Datatable
+            $query = Puestos::with('departamento');
 
-            // 3. Respuesta JSON con código 201 (Created)
-            return response()->json([
-                'message' => 'Puesto creado exitosamente.',
-                'puesto' => $puesto
-            ], 201);
+            // Filtro de búsqueda opcional por nombre
+            if ($request->filled('search')) {
+                $query->where('nombre', 'LIKE', '%' . $request->search . '%');
+            }
+
+            // Filtro por departamento si se requiere
+            if ($request->filled('IdDepartamento')) {
+                $query->where('IdDepartamento', $request->IdDepartamento);
+            }
+
+            $puestos = $query->orderBy('nombre', 'ASC')->get();
+
+            return response()->json(
+                $puestos,
+                200
+            );
         } catch (\Exception $e) {
-            Log::error("Error al crear Puesto: " . $e->getMessage());
-            // Respuesta de error 500 (Internal Server Error)
-            return response()->json(['error' => 'Hubo un error al crear el puesto. Por favor, inténtelo de nuevo.'], 500);
+            Log::error("Error en PuestosController@index: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al cargar puestos'], 500);
         }
     }
 
-
-
     /**
-     * Actualiza el puesto especificado en la base de datos.
-     * @param \Illuminate\Http\Request $request
-     * @param string $id
-     * @return \Illuminate\Http\JsonResponse
+     * Almacena un nuevo puesto.
      */
-    public function update(Request $request, string $id)
+    public function store(Request $request)
     {
-        $puesto = Puestos::findOrFail($id);
-        $primaryKey = $puesto->getKeyName(); // Obtener el nombre de la clave primaria, asumiendo Puestos_id
-
-        // 1. Validación de datos (se usa Rule::unique para ignorar el registro actual)
-        $validatedData = $request->validate([
-            'Puestos_nombre' => [
-                'required',
-                'string',
-                'max:255',
-
-            ],
-            'Puestos_estatus' => 'required|boolean',
-            // Asegura que el id del departamento exista en la tabla 'dbo.Departamentos'
-            'Puestos_idDepartamento' => 'required',
-        ], [
-            'Puestos_nombre.unique' => 'El nombre del puesto ya existe.',
-            'Puestos_idDepartamento.exists' => 'El departamento seleccionado no es válido.'
+        $validator = Validator::make($request->all(), [
+            'nombre'          => 'required|string|max:255',
+            'estatus'         => 'required|boolean',
+            'IdDepartamento'  => 'required|integer',
+            'TieneHorasExtra' => 'required|boolean',
         ]);
 
-        try {
-            // 2. Actualización del registro
-            $puesto->update($validatedData);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 400);
+        }
 
-            // 3. Respuesta JSON con código 200 (OK) y el modelo actualizado
+        try {
+            $puesto = Puestos::create($request->all());
             return response()->json([
-                'message' => 'Puesto actualizado exitosamente.',
-                'puesto' => $puesto
+                'success' => true,
+                'message' => 'Puesto creado con éxito',
+                'data' => $puesto
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error("Error en PuestosController@store: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al guardar el puesto'], 500);
+        }
+    }
+
+    /**
+     * Muestra un puesto específico.
+     */
+    public function show($id)
+    {
+        $puesto = Puestos::with('departamento')->find($id);
+
+        if (!$puesto) {
+            return response()->json(['success' => false, 'message' => 'Puesto no encontrado'], 404);
+        }
+
+        return response()->json(['success' => true, 'data' => $puesto], 200);
+    }
+
+    /**
+     * Actualiza un puesto.
+     */
+    public function update(Request $request, $id)
+    {
+        $puesto = Puestos::find($id);
+
+        if (!$puesto) {
+            return response()->json(['success' => false, 'message' => 'Puesto no encontrado'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nombre'          => 'sometimes|required|string|max:255',
+            'estatus'         => 'sometimes|required|boolean',
+            'IdDepartamento'  => 'sometimes|required|integer',
+            'TieneHorasExtra' => 'sometimes|required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 400);
+        }
+
+        try {
+            $puesto->update($request->all());
+            return response()->json([
+                'success' => true,
+                'message' => 'Puesto actualizado con éxito',
+                'data' => $puesto
             ], 200);
         } catch (\Exception $e) {
-            Log::error("Error al actualizar Puesto ID {$id}: " . $e->getMessage());
-            // Respuesta de error 500
-            return response()->json(['error' => 'Hubo un error al actualizar el puesto. Por favor, inténtelo de nuevo.'], 500);
+            Log::error("Error en PuestosController@update: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al actualizar el puesto'], 500);
+        }
+    }
+
+    /**
+     * Elimina un puesto.
+     */
+    public function destroy($id)
+    {
+        try {
+            $puesto = Puestos::find($id);
+
+            if (!$puesto) {
+                return response()->json(['success' => false, 'message' => 'Puesto no encontrado'], 404);
+            }
+
+            $puesto->delete();
+            return response()->json(['success' => true, 'message' => 'Puesto eliminado'], 200);
+        } catch (\Exception $e) {
+            Log::error("Error en PuestosController@destroy: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'No se puede eliminar el puesto (puede tener registros asociados)'], 500);
         }
     }
 }

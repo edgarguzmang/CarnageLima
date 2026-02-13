@@ -275,9 +275,9 @@ export default function Puestos() {
     const columns = [
         {
             header: "Estatus",
-            accessor: "Puestos_estatus",
-            cell: ({ item: { Puestos_estatus } }) => {
-                const color = String(Puestos_estatus) === "1"
+            accessor: "estatus",
+            cell: ({ item: { estatus } }) => {
+                const color = String(estatus) === "1"
                     ? "bg-green-300" // Si es "1"
                     : "bg-red-300";  // Si NO es "1" (incluyendo "2", "0", null, etc.)
 
@@ -286,8 +286,8 @@ export default function Puestos() {
                 );
             },
         },
-        { header: 'Nombre del Puesto', accessor: 'Puestos_nombre' },
-        { header: 'Departamento', accessor: 'departamento.Departamentos_nombre' },
+        { header: 'Nombre del Puesto', accessor: 'nombre' },
+        { header: 'Departamento', accessor: 'departamento.nombre' },
         {
             header: "Acciones", accessor: "Acciones", cell: (eprops) => (<div className="flex space-x-2">
                 <button
@@ -306,8 +306,8 @@ export default function Puestos() {
                 <h2 className="text-3xl font-bold text-gray-800">Gestión de Puestos</h2>
                 <button
                     onClick={openCreateModal}
-                    className="flex items-center px-4 py-2 text-base font-semibold text-white bg-green-600 rounded-lg shadow-md hover:bg-green-700 transition duration-150 ease-in-out"
-                >
+                    className="flex items-center px-4 py-2 text-base font-semibold text-white rounded-lg shadow-md  transition duration-150 ease-in-out"
+                    style={{ backgroundColor: '#A61A18' }}                >
                     + Nuevo Puesto
                 </button>
             </div>

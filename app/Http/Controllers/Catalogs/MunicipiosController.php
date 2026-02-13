@@ -23,7 +23,7 @@ class MunicipiosController extends Controller
         }
 
         // Usamos paginación porque los municipios son miles
-        return response()->json($query->paginate(15), 200);
+        return response()->json($query->get(), 200);
     }
 
     /**

@@ -10,16 +10,17 @@ class Puestos extends Model
 {
     use HasFactory;
     public $timestamps = false;
-    protected $table = 'dbo.Puestos';
-    protected $primaryKey = 'Puestos_id';
+    protected $table = 'dbo.Puesto';
+    protected $primaryKey = 'IdPuesto';
     protected $fillable = [
-        'Puestos_nombre',
-        'Puestos_estatus',
-        'Puestos_idDepartamento',
+        'nombre',
+        'estatus',
+        'IdDepartamento',
+        'TieneHorasExtra',
     ];
 
-     public function departamento(): BelongsTo
+    public function departamento(): BelongsTo
     {
-        return $this->belongsTo(Departamento::class, 'Puestos_idDepartamento', 'Departamentos_id');
+        return $this->belongsTo(Departamento::class, 'IdDepartamento', 'IdDepartamento');
     }
 }
