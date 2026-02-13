@@ -1,11 +1,9 @@
 <?php
 
-;
+
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RolesController;
-// use App\Http\Controllers\Catalogos\ProductosController;
-// use App\Http\Controllers\Catalogos\AsuntosController;
 use App\Http\Controllers\Catalogs\CodigosController;
 use App\Http\Controllers\Catalogs\CorreosController;
 use App\Http\Controllers\Catalogs\DepartamentoController;
@@ -17,6 +15,9 @@ use App\Http\Controllers\Catalogs\PuestosController;
 use App\Http\Controllers\Catalogs\RegistroEntradaController;
 use App\Http\Controllers\Catalogs\UnidadesController;
 use App\Http\Controllers\Catalogs\AsuntosController;
+use App\Http\Controllers\Catalogs\ColoniasController;
+use App\Http\Controllers\Catalogs\EstadosController;
+use App\Http\Controllers\Catalogs\MunicipiosController;
 use App\Http\Controllers\Catalogs\PersonasController;
 use App\Http\Controllers\Catalogs\ProductosController;
 
@@ -38,162 +39,170 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Route::get('user/menus', [UserController::class, 'menus'])->name('user.menus');
 Route::get('user/menus/{id}', [UserController::class, 'menus'])->name('user.menus');
-// URL: /user/5/menus
+
+
+Route::resource('destinos', DestinosController::class)->only([
+    'index',
+    'store',
+    'update'
+]);
+
+// Esto crea automáticamente las 5 rutas: index, store, show, update, destroy
+Route::resource('unidades', UnidadesController::class)->only([
+    'index',
+    'store',
+    'show',
+    'update',
+    'destroy'
+]);
+
+Route::resource('motivos', MotivosController::class)->only([
+    'index',
+    'store',
+    'update'
+]);
+
+
+Route::resource('menus', MenuController::class)->only([
+    'index',
+    'store',
+    'update'
+]);
+
+
+Route::resource('listaverificacion', ListaVerificacionController::class)->only([
+    'index',
+    'store',
+    'update'
+]);
 
 
 
- Route::resource('destinos', DestinosController::class)->only([
-        'index',    // (GET /api/destinos)
-        'store',    // (POST /api/destinos)
-        'update'    // (PUT/PATCH /api/destinos/{destino})
-    ]);
 
-    // Esto crea automáticamente las 5 rutas: index, store, show, update, destroy
-    Route::resource('unidades', UnidadesController::class)->only([
-        'index',
-        'store',
-        'show',
-        'update',
-        'destroy'
-    ]);
-
-    Route::resource('motivos', MotivosController::class)->only([
-        'index',  // Registra el método index (GET)
-        'store',  // Registra el método store (POST)
-        'update'  // Registra el método update (PUT/PATCH)
-    ]);
+Route::resource('departamentos', DepartamentoController::class)->only([
+    'index',
+    'store',
+    'update'
+]);
 
 
-    Route::resource('menus', MenuController::class)->only([
-        'index',  // Registra el método index (GET)
-        'store',  // Registra el método store (POST)
-        'update'  // Registra el método update (PUT/PATCH)
-    ]);
+Route::resource('puestos', PuestosController::class)->only([
+    'index',
+    'store',
+    'update'
+]);
 
 
-    Route::resource('listaverificacion', ListaVerificacionController::class)->only([
-        'index',  // Registra el método index (GET)
-        'store',  // Registra el método store (POST)
-        'update'  // Registra el método update (PUT/PATCH)
-    ]);
+Route::resource('codigos', CodigosController::class)->only([
+    'index',
+    'store',
+    'update'
+]);
 
 
-    
-
-    Route::resource('departamentos', DepartamentoController::class)->only([
-        'index',  // Registra el método index (GET)
-        'store',  // Registra el método store (POST)
-        'update'  // Registra el método update (PUT/PATCH)
-    ]);
+Route::resource('asuntos', AsuntosController::class)->only([
+    'index',
+    'store',
+    'update'
+]);
 
 
-    Route::resource('puestos', PuestosController::class)->only([
-        'index',  // Registra el método index (GET)
-        'store',  // Registra el método store (POST)
-        'update'  // Registra el método update (PUT/PATCH)
-    ]);
+Route::resource('productos', ProductosController::class)->only([
+    'index',
+    'store',
+    'update'
+]);
 
+Route::resource('estados', EstadosController::class)->only([
+    'index',
+    'store',
+    'update'
+]);
 
-     Route::resource('codigos', CodigosController::class)->only([
-        'index',
-        'store',
-        'update'
-    ]);
+Route::resource('municipios', MunicipiosController::class)->only([
+    'index',
+    'store',
+    'update'
+]);
 
-
-    Route::resource('asuntos', AsuntosController::class)->only([
-        'index',
-        'store',
-        'update'
-    ]);
-
-     Route::resource('productos', controller: ProductosController::class)->only([
-        'index',
-        'store',
-        'update'
-    ]);
+Route::resource('colonias', ColoniasController::class)->only([
+    'index',
+    'store',
+    'update'
+]);
 
 
 
-    
+Route::get('user/menus/{id}', [UserController::class, 'menus'])->name('user.menus');
 
-    // Route::get('menus-tree', [MenuController::class, 'getTree'])->name('menus-tree');
+Route::get('CondicionesUnidad', [ListaVerificacionController::class, 'CondicionesUnidad'])->name('CondicionesUnidad');
 
+Route::get('menus-tree', [MenuController::class, 'getTree'])->name('menus-tree');
+Route::get('QuienconQuienUnidades', [UnidadesController::class, 'QuienconQuienUnidades'])->name('QuienconQuienUnidades');
+Route::get('QuienconQuienUnidadesDashboard', [UnidadesController::class, 'QuienconQuienUnidadesDashboard'])->name('QuienconQuienUnidadesDashboard');
+Route::get('AutorizacionQuienconQuienUnidades', [UnidadesController::class, 'AutorizacionQuienconQuienUnidades'])->name('AutorizacionQuienconQuienUnidades');
 
-
-    // Route::get('user/menus', [UserController::class, 'menus'])->name('user.menus');
-
-    Route::get('user/menus/{id}', [UserController::class, 'menus'])->name('user.menus');
-
-    Route::get('CondicionesUnidad', [ListaVerificacionController::class, 'CondicionesUnidad'])->name('CondicionesUnidad');
-
-    Route::get('menus-tree', [MenuController::class, 'getTree'])->name('menus-tree');
-    Route::get('QuienconQuienUnidades', [UnidadesController::class, 'QuienconQuienUnidades'])->name('QuienconQuienUnidades');
-    Route::get('QuienconQuienUnidadesDashboard', [UnidadesController::class, 'QuienconQuienUnidadesDashboard'])->name('QuienconQuienUnidadesDashboard');
-    Route::get('AutorizacionQuienconQuienUnidades', [UnidadesController::class, 'AutorizacionQuienconQuienUnidades'])->name('AutorizacionQuienconQuienUnidades');
-
-    Route::post('AuthorizacionQuienCQuien', [UnidadesController::class, 'AuthorizacionQuienCQuien'])->name('AuthorizacionQuienCQuien');
+Route::post('AuthorizacionQuienCQuien', [UnidadesController::class, 'AuthorizacionQuienCQuien'])->name('AuthorizacionQuienCQuien');
 
 
-    
-
-    
-    Route::get('QuienconQuienControl', [UnidadesController::class, 'QuienconQuienControl'])->name('QuienconQuienControl');
-    Route::get('DashboardUnidad', [UnidadesController::class, 'DashboardUnidad'])->name('DashboardUnidad');
-    Route::get('UnidadesQuiencQuien', [UnidadesController::class, 'UnidadesQuiencQuien'])->name('UnidadesQuiencQuien');
-    Route::post('ReporteMovimientos', [UnidadesController::class, 'ReporteMovimientos'])->name('ReporteMovimientos');
-
-    Route::get('DestinosQuiencQuien', [DestinosController::class, 'DestinosQuiencQuien'])->name('DestinosQuiencQuien');
-    Route::get('MotivosQuiencQuien', [MotivosController::class, 'MotivosQuiencQuien'])->name('MotivosQuiencQuien');
-    Route::get('DepartamentosActivos', [DepartamentoController::class, 'DepartamentosActivos'])->name('DepartamentosActivos');
-
-    Route::post('/asignaciones', [RegistroEntradaController::class, 'store'])->name('asignaciones.store');
-    Route::post('/codesend', [RegistroEntradaController::class, 'codesend'])->name('codesend');
-    Route::post('/verifycode', [RegistroEntradaController::class, 'verifycode'])->name('verifycode');
 
 
-    
-    Route::post('/changesswho',  [RegistroEntradaController::class, 'changesswho'])->name('changesswho');
-    Route::post('/WhoDestint',  [RegistroEntradaController::class, 'WhoDestint'])->name('WhoDestint');
-    Route::get('/choferes', [UserController::class, 'choferes'])->name('choferes');
+
+Route::get('QuienconQuienControl', [UnidadesController::class, 'QuienconQuienControl'])->name('QuienconQuienControl');
+Route::get('DashboardUnidad', [UnidadesController::class, 'DashboardUnidad'])->name('DashboardUnidad');
+Route::get('UnidadesQuiencQuien', [UnidadesController::class, 'UnidadesQuiencQuien'])->name('UnidadesQuiencQuien');
+Route::post('ReporteMovimientos', [UnidadesController::class, 'ReporteMovimientos'])->name('ReporteMovimientos');
+
+Route::get('DestinosQuiencQuien', [DestinosController::class, 'DestinosQuiencQuien'])->name('DestinosQuiencQuien');
+Route::get('MotivosQuiencQuien', [MotivosController::class, 'MotivosQuiencQuien'])->name('MotivosQuiencQuien');
+Route::get('DepartamentosActivos', [DepartamentoController::class, 'DepartamentosActivos'])->name('DepartamentosActivos');
+
+Route::post('/asignaciones', [RegistroEntradaController::class, 'store'])->name('asignaciones.store');
+Route::post('/codesend', [RegistroEntradaController::class, 'codesend'])->name('codesend');
+Route::post('/verifycode', [RegistroEntradaController::class, 'verifycode'])->name('verifycode');
 
 
-    Route::post('/WhoAyudantes',  [RegistroEntradaController::class, 'WhoAyudantes'])->name('WhoAyudantes');
 
-    
-    Route::get('indexconfiguracioncorreo', [CorreosController::class, 'indexconfiguracioncorreo'])->name('indexconfiguracioncorreo');
-    Route::post('ConfiguracionCorreoStore', [CorreosController::class, 'ConfiguracionCorreoStore'])->name('ConfiguracionCorreoStore');
-    Route::post('sendMailTest', [RegistroEntradaController::class, 'sendMailTest'])->name('sendMailTest');
+Route::post('/changesswho',  [RegistroEntradaController::class, 'changesswho'])->name('changesswho');
+Route::post('/WhoDestint',  [RegistroEntradaController::class, 'WhoDestint'])->name('WhoDestint');
+Route::get('/choferes', [UserController::class, 'choferes'])->name('choferes');
 
-       
-    
 
-    
-    Route::post('ultimos-movimientos-unidad', [RegistroEntradaController::class, 'getUltimosMovimientosUnidad'])->name('ultimos-movimientos-unidad');
+Route::post('/WhoAyudantes',  [RegistroEntradaController::class, 'WhoAyudantes'])->name('WhoAyudantes');
 
-    Route::resource('users', UserController::class)->only([
-        'index', // GET /api/admin/users
-        'store', // POST /api/admin/users
-        'show',  // GET /api/admin/users/{user}
-        'update', // PUT/PATCH /api/admin/users/{user}
-        'destroy' // DELETE /api/admin/users/{user}
-    ]);
 
-    Route::resource('roles', RolesController::class)->only([
-        'index', // GET /api/admin/roles
-        'store', // POST /api/admin/roles
-        'update' // PUT/PATCH /api/admin/roles/{role}
-    ]);
+Route::get('indexconfiguracioncorreo', [CorreosController::class, 'indexconfiguracioncorreo'])->name('indexconfiguracioncorreo');
+Route::post('ConfiguracionCorreoStore', [CorreosController::class, 'ConfiguracionCorreoStore'])->name('ConfiguracionCorreoStore');
+Route::post('sendMailTest', [RegistroEntradaController::class, 'sendMailTest'])->name('sendMailTest');
 
-    Route::resource('correos', CorreosController::class)->only([
-        'index', // GET /api/admin/roles
-        'store', // POST /api/admin/roles
-        'update' // PUT/PATCH /api/admin/roles/{role}
-    ]);
 
-    Route::resource('personas', controller: PersonasController::class)->only([
+
+
+
+Route::post('ultimos-movimientos-unidad', [RegistroEntradaController::class, 'getUltimosMovimientosUnidad'])->name('ultimos-movimientos-unidad');
+
+Route::resource('users', UserController::class)->only([
+    'index', // GET /api/admin/users
+    'store', // POST /api/admin/users
+    'show',  // GET /api/admin/users/{user}
+    'update', // PUT/PATCH /api/admin/users/{user}
+    'destroy' // DELETE /api/admin/users/{user}
+]);
+
+Route::resource('roles', RolesController::class)->only([
+    'index', // GET /api/admin/roles
+    'store', // POST /api/admin/roles
+    'update' // PUT/PATCH /api/admin/roles/{role}
+]);
+
+Route::resource('correos', CorreosController::class)->only([
+    'index', // GET /api/admin/roles
+    'store', // POST /api/admin/roles
+    'update' // PUT/PATCH /api/admin/roles/{role}
+]);
+
+Route::resource('personas', controller: PersonasController::class)->only([
     'index',    // (GET /api/destinos)
     'store',    // (POST /api/destinos)
     'update'    // (PUT/PATCH /api/destinos/{destino})
@@ -209,5 +218,3 @@ Route::post('usuarioxmenu', [UserController::class, 'getUsuarioMenu'])->name('us
 Route::put('usuarioxmenu/{id}', [UserController::class, 'usuarioxmenu'])->name('usuarioxmenu.update');
 
 Route::get('testcorreo', [ListaVerificacionController::class, 'testcorreo'])->name('testcorreo');
-
-

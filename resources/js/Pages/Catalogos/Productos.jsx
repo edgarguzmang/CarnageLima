@@ -6,26 +6,23 @@ import LoadingDiv from "@/Components/LoadingDiv";
 import request from "@/utils";
 
 // --- Configuración de Rutas ---
-const route = (name, params = {}) => {
-    const id = params.IdProducto;
+const getRoute = (name, id = null) => {
     const routeMap = {
         "productos.index": "/api/productos",
         "productos.store": "/api/productos",
         "productos.update": `/api/productos/${id}`,
     };
-    return routeMap[name] || `/${name}`;
+    return routeMap[name];
 };
 
-
 const userObject = JSON.parse(localStorage.getItem('user') || '{}');
-
 
 const initialProductData = {
     IdProducto: null,
     Nombre: "",
-    UnidadMedida: "Pieza", // Valor por defecto
+    UnidadMedida: "Pieza",
     EsSubproducto: 0,
-    idUsuario: userObject.IdUsuario, // Esto debería venir del auth de tu app
+    idUsuario: userObject.IdUsuario,
 };
 
 // --- Formulario Modal ---
@@ -35,6 +32,7 @@ function ProductFormDialog({ isOpen, closeModal, onSubmit, productToEdit, action
 
     useEffect(() => {
         if (isOpen) {
+            // Si vamos a editar, cargamos el producto, si no, reseteamos al estado inicial
             setProductData(productToEdit || initialProductData);
             setErrors({});
         }
@@ -74,7 +72,6 @@ function ProductFormDialog({ isOpen, closeModal, onSubmit, productToEdit, action
                         </DialogTitle>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            {/* Nombre */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Nombre del Producto</label>
                                 <input
@@ -87,7 +84,6 @@ function ProductFormDialog({ isOpen, closeModal, onSubmit, productToEdit, action
                                 />
                             </div>
 
-                            {/* Unidad de Medida */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Unidad de Medida</label>
                                 <select
@@ -103,7 +99,6 @@ function ProductFormDialog({ isOpen, closeModal, onSubmit, productToEdit, action
                                 </select>
                             </div>
 
-                            {/* Es Subproducto */}
                             <div className="flex items-center space-x-2 pt-2">
                                 <input
                                     type="checkbox"
@@ -144,7 +139,8 @@ export default function Productos() {
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            const data = await fetch(route("productos.index")).then(res => res.json());
+            const response = await fetch(getRoute("productos.index"));
+            const data = await response.json();
             setProducts(data);
         } catch (error) {
             toast.error("Error al cargar productos");
@@ -168,17 +164,34 @@ export default function Productos() {
     };
 
     const handleSubmit = async (data) => {
-        const isEdit = !!data.IdProducto;
-        const url = isEdit ? route("productos.update", { IdProducto: data.IdProducto }) : route("productos.store");
-        const method = isEdit ? "PUT" : "POST";
+        const isEdit = action === 'edit';
+        
+        // URL dinámica basada en la acción
+        const url = isEdit 
+            ? getRoute("productos.update", data.IdProducto) 
+            : getRoute("productos.store");
+
+        /**
+         * NOTA IMPORTANTE PARA LARAVEL:
+         * Usamos POST siempre y enviamos "_method: PUT" en el body.
+         * Esto evita errores de "Method Not Allowed" en muchos servidores y configuraciones de Laravel.
+         */
+        const method = "POST"; 
+        const payload = isEdit 
+            ? { ...data, _method: 'PUT' } 
+            : data;
 
         try {
-            await request(url, method, data);
-            toast.success("Producto guardado con éxito");
+            await request(url, method, payload);
+            toast.success(isEdit ? "Producto actualizado" : "Producto creado");
             fetchData();
             setIsDialogOpen(false);
         } catch (error) {
+            console.error(error);
             toast.error("Error al procesar la solicitud");
+            if (error.response?.data?.errors) {
+                setErrors(error.response.data.errors);
+            }
         }
     };
 
@@ -212,16 +225,22 @@ export default function Productos() {
                         {
                             header: 'Fecha Reg.',
                             accessor: 'fecha',
-                            cell: ({ item }) => new Date(item.fecha).toLocaleDateString()
+                            cell: ({ item }) => item.fecha ? new Date(item.fecha).toLocaleDateString() : 'N/A'
                         },
                         {
-                            header: 'Acciones',
-                            cell: ({ item }) => (
-                                <button onClick={() => openEdit(item)} className="text-blue-600 hover:underline">
-                                    Editar
-                                </button>
+                            header: "Acciones", 
+                            accessor: "Acciones", 
+                            cell: (eprops) => (
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => openEdit(eprops.item)}
+                                        className="px-3 py-1 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-200"
+                                    >
+                                        Editar
+                                    </button>
+                                </div>
                             )
-                        }
+                        },
                     ]}
                 />
             )}

@@ -32,6 +32,9 @@ const routes = [
     { path: "/AutorizacionQuien", import: lazy(() => import('./Catalogos/AutorizacionQuien')) },
     { path: "/Asuntos", import: lazy(() => import('./Catalogos/Asuntos')) },
     { path: "/productos", import: lazy(() => import('./Catalogos/Productos')) },
+    { path: "/estados", import: lazy(() => import('./SAT/Estados')) },
+    { path: "/municipios", import: lazy(() => import('./SAT/Municipios')) },
+    { path: "/colonias", import: lazy(() => import('./SAT/Colonias')) },
 
 
 ];
