@@ -16,12 +16,16 @@ const route = (name, params = {}) => {
     return routeMap[name] || `/${name}`;
 };
 
+
+const userObject = JSON.parse(localStorage.getItem('user') || '{}');
+
+
 const initialProductData = {
     IdProducto: null,
     Nombre: "",
     UnidadMedida: "Pieza", // Valor por defecto
     EsSubproducto: 0,
-    idUsuario: 1, // Esto debería venir del auth de tu app
+    idUsuario: userObject.IdUsuario, // Esto debería venir del auth de tu app
 };
 
 // --- Formulario Modal ---
@@ -196,8 +200,8 @@ export default function Productos() {
                     columns={[
                         { header: 'Nombre', accessor: 'Nombre' },
                         { header: 'U. Medida', accessor: 'UnidadMedida' },
-                        { 
-                            header: 'Tipo', 
+                        {
+                            header: 'Tipo',
                             accessor: 'EsSubproducto',
                             cell: ({ item }) => (
                                 <span className={`px-2 py-1 rounded-full text-xs font-bold ${item.EsSubproducto ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
@@ -205,8 +209,8 @@ export default function Productos() {
                                 </span>
                             )
                         },
-                        { 
-                            header: 'Fecha Reg.', 
+                        {
+                            header: 'Fecha Reg.',
                             accessor: 'fecha',
                             cell: ({ item }) => new Date(item.fecha).toLocaleDateString()
                         },
